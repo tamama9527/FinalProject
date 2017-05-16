@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="5"
+    android:background="#244484">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/Account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="帳號"
+            android:inputType="textPersonName"
+            android:textColor="#ffffff"
+            android:textColorHint="#FFFFFF"
+            android:layout_marginTop="214dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <EditText
+            android:id="@+id/Password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/Account"
+            android:layout_alignStart="@+id/Account"
+            android:layout_below="@+id/Account"
+            android:layout_marginTop="31dp"
+            android:ems="10"
+            android:hint="密碼"
+            android:inputType="textPassword"
+            android:textColor="#ffffff"
+            android:textColorHint="#FFFFFF" />
+
+        <Button
+            android:id="@+id/Login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:background="@drawable/button_style"
+            android:elevation="0dp"
+            android:text="登入"
+            android:textColor="#FFFFFF"
+            android:layout_below="@+id/Password"
+            android:layout_alignLeft="@+id/Password"
+            android:layout_alignStart="@+id/Password"
+            android:layout_alignRight="@+id/Password"
+            android:layout_alignEnd="@+id/Password" />
+
+        <TextView
+            android:id="@+id/register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Login_button"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="35dp"
+            android:text="@string/register"
+            android:textColor="#FFFFFF" />
+
+    </RelativeLayout>
+</LinearLayout>

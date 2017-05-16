@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="5"
+    android:background="#244484">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/Register_Account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Register_nickname"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="27dp"
+            android:ems="10"
+            android:hint="帳號"
+            android:inputType="textPersonName"
+            android:textColor="#ffffff"
+            android:textColorHint="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/Register_Password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/Register_Account"
+            android:layout_alignStart="@+id/Register_Account"
+            android:layout_below="@+id/Register_Account"
+            android:layout_marginTop="19dp"
+            android:ems="10"
+            android:hint="確認密碼"
+            android:inputType="textPassword"
+            android:textColor="#ffffff"
+            android:textColorHint="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/Register_Check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/Register_Password"
+            android:layout_alignStart="@+id/Register_Password"
+            android:layout_alignTop="@+id/Register_Password"
+            android:layout_marginTop="69dp"
+            android:ems="10"
+            android:hint="密碼"
+            android:inputType="textPassword"
+            android:textColor="#ffffff"
+            android:textColorHint="#FFFFFF" />
+
+        <Button
+            android:id="@+id/Register_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/Register_Check"
+            android:layout_alignLeft="@+id/Register_Check"
+            android:layout_alignRight="@+id/Register_Check"
+            android:layout_alignStart="@+id/Register_Check"
+            android:layout_below="@+id/Register_Check"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/button_style"
+            android:elevation="0dp"
+            android:text="註冊"
+            android:textColor="#FFFFFF" />
+
+        <EditText
+            android:id="@+id/Register_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/Register_Account"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/Register_Account"
+            android:layout_marginTop="142dp"
+            android:ems="10"
+            android:hint="暱稱"
+            android:inputType="textPersonName"
+            android:textColor="#ffffff"
+            android:textColorHint="#FFFFFF" />
+
+    </RelativeLayout>
+</LinearLayout>

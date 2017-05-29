@@ -47,8 +47,6 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
         initUI();
-        //helper = new MyDBHelper(this, "save.db", null, 1);
-
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         super.onCreate(savedInstanceState);
@@ -94,7 +92,6 @@ public class MainActivity extends Activity implements Button.OnClickListener {
     @Override
     public void onClick(View V) {
 
-        ContentValues values = new ContentValues();
         if (V.getId() == login_button.getId()) {
             login();
         } else if (V.getId() == Register.getId()) {

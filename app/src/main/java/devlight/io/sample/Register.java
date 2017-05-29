@@ -59,7 +59,7 @@ public class Register extends Activity implements Button.OnClickListener {
                                 Log.d("帳號註冊失敗", task.getException().toString());
                             } else {
                                 final FirebaseUser currentUser = mAuth.getCurrentUser();
-                                myRef.addValueEventListener(new ValueEventListener() {
+                                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         if (!dataSnapshot.hasChild(currentUser.getUid())) {

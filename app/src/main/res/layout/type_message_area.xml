@@ -4,20 +4,22 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
     android:gravity="bottom"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:weightSum="1">
 
     <EditText
-        android:layout_width="match_parent"
+        android:id="@+id/editText"
+        android:layout_width="252dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColorHint="#CFD8DC"
+        android:layout_weight="1.04"
+        android:hint="Write a message"
         android:textColor="#CFD8DC"
-        android:hint="Write a message" />
+        android:textColorHint="#CFD8DC" />
 
     <ImageView
-        android:layout_width="match_parent"
+        android:id="@+id/imageView8"
+        android:layout_width="82dp"
         android:layout_height="wrap_content"
-        android:layout_weight="5"
         android:padding="4dp"
         android:src="@android:drawable/ic_menu_send" />
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,6 +40,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("member");
     private int count;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +56,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
-                return 5;
+                return 3;
             }
 
             @Override
@@ -84,8 +86,6 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                                 )
                         );
                         recyclerView.setAdapter(new RecycleAdapter());
-                        container.addView(view);
-                        return view;
                     case 1:
                         txtPage.setText(String.format("Page #%d", position));
                         txtPage.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +95,9 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                                 HorizontalNtbActivity.this.finish();
                             }
                         });
+                        break;
+                    case 2:
+                        view = LayoutInflater.from(getBaseContext()).inflate(R.layout.add_friend, null, false);
                         break;
                     default:
                         txtPage.setText(String.format("Page #%d", position));
@@ -122,7 +125,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                         getResources().getDrawable(R.drawable.ic_friend),
                         Color.parseColor(colors[0]))
                         //.selectedIcon(getResources().getDrawable(R.drawable.ic_sixth))
-                        .title("Heart")
+                        .title("Friend")
                         .badgeTitle("NTB")
                         .build()
         );
@@ -144,24 +147,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                         .badgeTitle("state")
                         .build()
         );
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_fourth),
-                        Color.parseColor(colors[3]))
-//                        .selectedIcon(getResources().getDrawable(R.drawable.ic_eighth))
-                        .title("Flag")
-                        .badgeTitle("icon")
-                        .build()
-        );
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_fifth),
-                        Color.parseColor(colors[4]))
-                        .selectedIcon(getResources().getDrawable(R.drawable.ic_eighth))
-                        .title("Medal")
-                        .badgeTitle("777")
-                        .build()
-        );
+
 
         navigationTabBar.setModels(models);
         navigationTabBar.setBgColor(Color.rgb(36, 68, 132));
@@ -203,23 +189,26 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
     public void onClick(View v) {
 
     }
-    public void SetDataBase(){
-        count=getIntent().getExtras().getInt("count");
-        user= FirebaseAuth.getInstance().getCurrentUser();
-        Log.d("number of count",String.valueOf(count));
-        temp=new String[count];
-        name=new String[count];
+
+    public void SetDataBase() {
+        count = getIntent().getExtras().getInt("count");
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        Log.d("number of count", String.valueOf(count));
+        temp = new String[count];
+        name = new String[count];
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            int i=0;
+            int i = 0;
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot friendshot:dataSnapshot.child(user.getUid()).child("friend").getChildren()){
-                    temp[i]=friendshot.getValue().toString();
-                    Log.d("number of i",String.valueOf(i));
-                    Log.d("friend",friendshot.getValue().toString());
+                for (DataSnapshot groupshot : dataSnapshot.child(user.getUid()).child("group").getChildren()) {
+                    temp[i] = groupshot.getValue().toString();
+                    Log.d("number of i", String.valueOf(i));
+                    Log.d("group", groupshot.getValue().toString());
                     i++;
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -227,8 +216,9 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(int i=0;i<count;i++){
-                    name[i]=dataSnapshot.child(temp[i]).child("name").getValue().toString();
+                for (int i = 0; i < count; i++) {
+                    name[i] = temp[i];
+                    //dataSnapshot.child(temp[i]).child("name").getValue().toString();
                 }
             }
 
@@ -238,6 +228,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
             }
         });
     }
+
     public class RecycleAdapter extends RecyclerView.Adapter<HorizontalNtbActivity.RecycleAdapter.ViewHolder> {
 
         @Override
@@ -245,9 +236,20 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
             final View view = LayoutInflater.from(getBaseContext()).inflate(R.layout.item_list, parent, false);
             return new HorizontalNtbActivity.RecycleAdapter.ViewHolder(view);
         }
+
         @Override
         public void onBindViewHolder(final HorizontalNtbActivity.RecycleAdapter.ViewHolder holder, final int position) {
             holder.txt.setText(name[position]);
+            holder.txt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent i;
+                    i = new Intent(HorizontalNtbActivity.this, Message.class);
+                    i.putExtra("group", name[position]);
+                    startActivity(i);
+                }
+            });
         }
 
         @Override

@@ -20,11 +20,10 @@
             android:name=".HorizontalNtbActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
-        <activity android:name=".HorizontalCoordinatorNtbActivity" />
-
         <activity android:name=".VerticalNtbActivity" />
 
         <activity android:name=".Register" />
+        <activity android:name=".Message" />
 
         <meta-data
             android:name="com.google.android.gms.version"

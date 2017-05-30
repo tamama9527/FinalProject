@@ -10,6 +10,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import android.Manifest;
 import android.content.Context;
@@ -21,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -50,14 +58,23 @@ public class googlemap extends AppCompatActivity
      * {@link #onRequestPermissionsResult(int, String[], int[])}.
      */
     private boolean mPermissionDenied = false;
-
+    private String group_name;
     private GoogleMap mMap;
+    private LatLngBounds.Builder builder;
+    private FirebaseUser user;
+    private double[] lat;
+    private double[] lng;
+    private int count;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        myRef = database.getReference();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        group_name=getIntent().getExtras().getString("group");
+        user = FirebaseAuth.getInstance().getCurrentUser();
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -69,7 +86,29 @@ public class googlemap extends AppCompatActivity
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                start(mMap, 35.688734, 139.742990);
+                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int i=0;
+                        count=(int) dataSnapshot.child("group").child(group_name).child("member").getChildrenCount()-1;
+                        lat=new double[count];
+                        lng=new double[count];
+                        for(DataSnapshot user_token:dataSnapshot.child("group").child(group_name).child("member").getChildren()){
+                            if(user_token.getValue().toString().equals(user.getUid().toString())==false){
+                                lat[i]=(double)dataSnapshot.child("member").child(user_token.getValue().toString()).child("location").child("lat").getValue();
+                                lng[i]=(double)dataSnapshot.child("member").child(user_token.getValue().toString()).child("location").child("lng").getValue();
+                                i++;
+                            }
+                        }
+                        start(mMap);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                start(mMap);
             }
         });
         mMap.setOnMyLocationButtonClickListener(this);
@@ -77,11 +116,13 @@ public class googlemap extends AppCompatActivity
 
     }
 
-    public void start(GoogleMap map, double lat, double lng) {
-        MarkerOptions loc = new MarkerOptions().position(new LatLng(lat, lng));
-        map.addMarker(loc);
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(loc.getPosition());
+    public void start(final GoogleMap map) {
+        builder = new LatLngBounds.Builder();
+        for(int i=0;i<count;i++){
+            MarkerOptions loc = new MarkerOptions().position(new LatLng(lat[i], lng[i]));
+            map.addMarker(loc);
+            builder.include(loc.getPosition());
+        }
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -89,6 +130,8 @@ public class googlemap extends AppCompatActivity
         Location myLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (myLocation != null) {
             builder.include(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+            myRef.child("member").child(user.getUid()).child("location").child("lat").setValue(myLocation.getLatitude());
+            myRef.child("member").child(user.getUid()).child("location").child("lng").setValue(myLocation.getLongitude());
             LatLngBounds bounds = builder.build();
             int padding = 150; // offset from edges of the map in pixels
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
@@ -161,5 +204,4 @@ public class googlemap extends AppCompatActivity
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
-
 }

@@ -62,12 +62,13 @@ public class MainActivity extends Activity implements Button.OnClickListener {
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            Friend_count= (int) dataSnapshot.child(userId).child("friend").getChildrenCount();
+                            Friend_count= (int) dataSnapshot.child(userId).child("group").getChildrenCount();
                             Log.d("Friend_count",String.valueOf(Friend_count));
                             i = new Intent(MainActivity.this, HorizontalNtbActivity.class);
                             // User is signed in
                             i.putExtra("count",Friend_count);
                             startActivity(i);
+                            MainActivity.this.finish();
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
@@ -112,7 +113,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
-                            Log.d("onComplete", "登入失敗");
+                            Toast.makeText(MainActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

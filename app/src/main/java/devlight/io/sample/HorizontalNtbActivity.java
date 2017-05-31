@@ -15,7 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,9 +39,14 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
     private String[] temp;
     private String[] name;
     private FirebaseUser user;
+    private RadioButton new_group;
+    private RadioButton friend;
+    private RecyclerView recyclerView;
+    private RadioButton group;
+    private Button add_friend;
     private FirebaseAuth mAuth;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getReference("member");
+    DatabaseReference myRef = database.getReference();
     private int count;
 
     @Override
@@ -79,26 +87,76 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                         view = LayoutInflater.from(
                                 getBaseContext()).inflate(R.layout.item_vp_list, null, false);
 
-                        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.rv);
+                        recyclerView = (RecyclerView) view.findViewById(R.id.rv);
                         recyclerView.setHasFixedSize(true);
                         recyclerView.setLayoutManager(new LinearLayoutManager(
                                         getBaseContext(), LinearLayoutManager.VERTICAL, false
                                 )
                         );
                         recyclerView.setAdapter(new RecycleAdapter());
+                        break;
                     case 1:
-                        txtPage.setText(String.format("Page #%d", position));
-                        txtPage.setOnClickListener(new View.OnClickListener() {
+                        view = LayoutInflater.from(getBaseContext()).inflate(R.layout.add_friend, null, false);
+                        add_friend = (Button) view.findViewById(R.id.button_add);
+                        final EditText add_text = (EditText) view.findViewById(R.id.add_input);
+                        final View finalView = view;
+                        friend = (RadioButton) finalView.findViewById(R.id.radioButton);
+                        group = (RadioButton) finalView.findViewById(R.id.radioButton2);
+                        new_group = (RadioButton) finalView.findViewById(R.id.radioButton3);
+                        setRatioButton();
+                        add_friend.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                mAuth.signOut();
-                                HorizontalNtbActivity.this.finish();
+                                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    int group_count;
+                                    int friend_count;
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (friend.isChecked()) {
+                                            friend_count = (int) dataSnapshot.child("member").child(user.getUid()).child("friend").getChildrenCount();
+                                            for (DataSnapshot friend_token : dataSnapshot.child("member").getChildren()) {
+                                                if (friend_token.child("name").getValue().toString().equals(add_text.getText().toString())) {
+                                                    myRef.child("member").child(user.getUid()).child("friend").child(String.valueOf(friend_count)).setValue(friend_token.getKey());
+                                                    add_text.setText("");
+                                                    Toast.makeText(HorizontalNtbActivity.this, "已成功加入好友", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                            recyclerView.setAdapter(new RecycleAdapter());
+                                        } else if (group.isChecked()) {
+                                            if(dataSnapshot.child("group").child(add_text.getText().toString()).exists()) {
+                                                group_count = (int) dataSnapshot.child("group").child(add_text.getText().toString()).child("member").getChildrenCount();
+                                                myRef.child("group").child(add_text.getText().toString()).child("member").child(String.valueOf(group_count)).setValue(user.getUid());
+                                                myRef.child("member").child(user.getUid()).child("group").child(String.valueOf(dataSnapshot.child("member").child(user.getUid()).child("group").getChildrenCount())).setValue(add_text.getText().toString());
+                                                Toast.makeText(HorizontalNtbActivity.this, "已成功加入群組", Toast.LENGTH_SHORT).show();
+                                                recyclerView.setAdapter(new RecycleAdapter());
+                                            }
+                                            else{
+                                                Toast.makeText(HorizontalNtbActivity.this, "群組不存在", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else if (new_group.isChecked()) {
+                                            if(!dataSnapshot.child("group").child(add_text.getText().toString()).exists()) {
+                                                group_count = (int) dataSnapshot.child("group").child(add_text.getText().toString()).child("member").getChildrenCount();
+                                                myRef.child("group").child(add_text.getText().toString()).child("member").child(String.valueOf(group_count)).setValue(user.getUid());
+                                                myRef.child("member").child(user.getUid()).child("group").child(String.valueOf(dataSnapshot.child("member").child(user.getUid()).child("group").getChildrenCount())).setValue(add_text.getText().toString());
+                                                Toast.makeText(HorizontalNtbActivity.this, "已成功新增群組", Toast.LENGTH_SHORT).show();
+                                                recyclerView.setAdapter(new RecycleAdapter());
+                                            }
+                                            else{
+                                                Toast.makeText(HorizontalNtbActivity.this, "已有相同名稱的群組", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
                         });
+
                         break;
-                    case 2:
-                        view = LayoutInflater.from(getBaseContext()).inflate(R.layout.add_friend, null, false);
-                        break;
+
                     default:
                         txtPage.setText(String.format("Page #%d", position));
                         txtPage.setOnClickListener(new View.OnClickListener() {
@@ -122,34 +180,22 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
         final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
         models.add(
                 new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_friend),
+                        getResources().getDrawable(R.drawable.message),
                         Color.parseColor(colors[0]))
                         //.selectedIcon(getResources().getDrawable(R.drawable.ic_sixth))
-                        .title("Friend")
-                        .badgeTitle("NTB")
+                        .title("Message")
                         .build()
         );
         models.add(
                 new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_second),
-                        Color.parseColor(colors[1]))
-//                        .selectedIcon(getResources().getDrawable(R.drawable.ic_eighth))
-                        .title("Cup")
-                        .badgeTitle("with")
-                        .build()
-        );
-        models.add(
-                new NavigationTabBar.Model.Builder(
-                        getResources().getDrawable(R.drawable.ic_third),
+                        getResources().getDrawable(R.drawable.add_friend),
                         Color.parseColor(colors[2]))
-                        .selectedIcon(getResources().getDrawable(R.drawable.ic_seventh))
-                        .title("Diploma")
-                        .badgeTitle("state")
+                        .title("Add")
                         .build()
         );
-
 
         navigationTabBar.setModels(models);
+        navigationTabBar.setIsBadged(false);
         navigationTabBar.setBgColor(Color.rgb(36, 68, 132));
         navigationTabBar.setViewPager(viewPager, 2);
         navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -190,41 +236,53 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
 
     }
 
+    public void setRatioButton() {
+
+        new_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                add_friend.setText("新增");
+                group.setChecked(false);
+                friend.setChecked(false);
+            }
+        });
+        friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                add_friend.setText("加入");
+                group.setChecked(false);
+                new_group.setChecked(false);
+            }
+        });
+        group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                add_friend.setText("加入");
+                new_group.setChecked(false);
+                friend.setChecked(false);
+            }
+        });
+    }
+
     public void SetDataBase() {
-        count = getIntent().getExtras().getInt("count");
         user = FirebaseAuth.getInstance().getCurrentUser();
         Log.d("number of count", String.valueOf(count));
-        temp = new String[count];
-        name = new String[count];
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            int i = 0;
 
+        myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot groupshot : dataSnapshot.child(user.getUid()).child("group").getChildren()) {
-                    temp[i] = groupshot.getValue().toString();
-                    Log.d("number of i", String.valueOf(i));
-                    Log.d("group", groupshot.getValue().toString());
+                int i = 0;
+                count = (int) dataSnapshot.child("member").child(user.getUid()).child("group").getChildrenCount();
+                temp = new String[count];
+                name = new String[count];
+                for (DataSnapshot groupshot : dataSnapshot.child("member").child(user.getUid()).child("group").getChildren()) {
+                    name[i] = groupshot.getValue().toString();
                     i++;
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (int i = 0; i < count; i++) {
-                    name[i] = temp[i];
-                    //dataSnapshot.child(temp[i]).child("name").getValue().toString();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }

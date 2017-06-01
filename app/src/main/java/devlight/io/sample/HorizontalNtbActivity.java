@@ -64,7 +64,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
-                return 3;
+                return 2;
             }
 
             @Override

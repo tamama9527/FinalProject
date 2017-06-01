@@ -54,8 +54,8 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_horizontal_ntb);
         mAuth = FirebaseAuth.getInstance();
-        SetDataBase();
         initUI();
+        SetDataBase();
     }
 
     private void initUI() {
@@ -145,6 +145,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                                                 Toast.makeText(HorizontalNtbActivity.this, "已有相同名稱的群組", Toast.LENGTH_SHORT).show();
                                             }
                                         }
+                                        SetDataBase();
                                     }
 
                                     @Override
@@ -266,9 +267,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
 
     public void SetDataBase() {
         user = FirebaseAuth.getInstance().getCurrentUser();
-        Log.d("number of count", String.valueOf(count));
-
-        myRef.addValueEventListener(new ValueEventListener() {
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int i = 0;
@@ -279,6 +278,7 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                     name[i] = groupshot.getValue().toString();
                     i++;
                 }
+                recyclerView.setAdapter(new RecycleAdapter());
             }
 
             @Override

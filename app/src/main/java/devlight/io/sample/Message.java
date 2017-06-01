@@ -27,6 +27,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,6 +52,8 @@ import android.Manifest;
 
 import java.io.File;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -66,6 +74,7 @@ public class Message extends Activity implements Button.OnClickListener {
     private Double[] lat;
     private Double[] lng;
     private int member_count;
+    private Button help_button;
     private Button map_button;
     private Button send_button;
     private Button file_button;
@@ -137,6 +146,8 @@ public class Message extends Activity implements Button.OnClickListener {
         file_button.setOnClickListener(this);
         map_button = (Button) findViewById(R.id.map_button);
         map_button.setOnClickListener(this);
+        help_button=(Button) findViewById(R.id.button_help);
+        help_button.setOnClickListener(this);
     }
 
 
@@ -194,9 +205,44 @@ public class Message extends Activity implements Button.OnClickListener {
             i = new Intent(Message.this,googlemap.class);
             i.putExtra("group",group_name);
             startActivity(i);
+        } else if(v.getId()==help_button.getId()){
+            post();
         }
     }
 
+    public void post() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="https://tamama.com.tw/project";
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Log.d("response",response.toString());
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("response","error");
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                Log.d("group",group_name);
+                Log.d("token",user.getUid());
+                params.put("group", group_name);
+                params.put("token", user.getUid());
+
+                return params;
+            }
+
+        };
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
+    }
     public static class text_message {
         public String text;
         public String type;

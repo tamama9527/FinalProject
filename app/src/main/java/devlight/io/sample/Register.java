@@ -2,6 +2,7 @@ package devlight.io.sample;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.RegionIterator;
 import android.os.Bundle;
 import android.os.StrictMode;
 
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.actions.ReserveIntents;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -49,30 +51,22 @@ public class Register extends Activity implements Button.OnClickListener {
         final EditText re_account = (EditText) findViewById(R.id.Register_Account);
         final EditText re_password = (EditText) findViewById(R.id.Register_Password);
         EditText re_check = (EditText) findViewById(R.id.Register_Check);
-        if (re_password.getText().toString().compareTo(re_check.getText().toString()) != 0) {
+        if (!re_password.getText().toString().equals(re_check.getText().toString())) {
         } else {
             mAuth.createUserWithEmailAndPassword(re_account.getText().toString(), re_password.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (!task.isSuccessful()) {
+                                Toast.makeText(Register.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
                                 Log.d("帳號註冊失敗", task.getException().toString());
                             } else {
-                                final FirebaseUser currentUser = mAuth.getCurrentUser();
-                                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (!dataSnapshot.hasChild(currentUser.getUid())) {
-                                            myRef.child(currentUser.getUid()).child("name").setValue(re_nickname.getText().toString());
-                                        }
-                                        Register.this.finish();
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                    }
-                                });
-
+                                myRef.child(mAuth.getCurrentUser().getUid()).child("name").setValue(re_nickname.getText().toString());
+                                Log.d("nickname", re_nickname.getText().toString());
+                                startActivity(
+                                        new Intent(Register.this, MainActivity.class)
+                                );
+                                Register.this.finish();
                             }
                         }
                     });

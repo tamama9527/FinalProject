@@ -104,6 +104,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
         startActivity(
                 new Intent(MainActivity.this, Register.class)
         );
+        MainActivity.this.finish();
     }
 
     public void login() {

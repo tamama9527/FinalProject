@@ -1,5 +1,6 @@
 package devlight.io.sample;
 
+import com.google.android.gms.location.*;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,6 +33,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import dalvik.annotation.TestTargetClass;
+import devlight.io.sample.GPSTracker;
 import devlight.io.sample.R;
 
 /**
@@ -84,7 +87,7 @@ public class googlemap extends AppCompatActivity
     public void onMapReady(GoogleMap map) {
         mMap = map;
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
+
             public void onMapLoaded() {
                 myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -113,7 +116,6 @@ public class googlemap extends AppCompatActivity
         });
         mMap.setOnMyLocationButtonClickListener(this);
         enableMyLocation();
-
     }
 
     public void start(final GoogleMap map) {
@@ -130,6 +132,8 @@ public class googlemap extends AppCompatActivity
         Location myLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (myLocation != null) {
             builder.include(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+            Log.d("my_lat",String.valueOf(myLocation.getLatitude()));
+            Log.d("my_lng",String.valueOf(myLocation.getLongitude()));
             myRef.child("member").child(user.getUid()).child("location").child("lat").setValue(myLocation.getLatitude());
             myRef.child("member").child(user.getUid()).child("location").child("lng").setValue(myLocation.getLongitude());
             LatLngBounds bounds = builder.build();
@@ -152,6 +156,14 @@ public class googlemap extends AppCompatActivity
         } else if (mMap != null) {
             // Access to the location has been granted to the app.
             mMap.setMyLocationEnabled(true);
+            mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener(){
+
+                @Override
+                public void onMyLocationChange(Location location) {
+                    myRef.child("member").child(user.getUid()).child("location").child("lat").setValue(location.getLatitude());
+                    myRef.child("member").child(user.getUid()).child("location").child("lng").setValue(location.getLongitude());
+                }
+            });
         }
     }
 
@@ -187,6 +199,7 @@ public class googlemap extends AppCompatActivity
         }
     }
 
+
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
@@ -204,4 +217,5 @@ public class googlemap extends AppCompatActivity
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }
+
 }

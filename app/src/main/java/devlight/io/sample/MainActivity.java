@@ -57,6 +57,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 user = firebaseAuth.getCurrentUser();
                 if (user != null) {
+                    Toast.makeText(MainActivity.this, "登入中請稍後...", Toast.LENGTH_SHORT).show();
                     userId=user.getUid();
                     myRef.child(userId).child("token").setValue(FirebaseInstanceId.getInstance().getToken());
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -76,6 +77,7 @@ public class MainActivity extends Activity implements Button.OnClickListener {
                     });
 
                 }
+                Toast.makeText(MainActivity.this, "未登錄", Toast.LENGTH_SHORT).show();
             }
         };
         mAuth.addAuthStateListener(mAuthListener);

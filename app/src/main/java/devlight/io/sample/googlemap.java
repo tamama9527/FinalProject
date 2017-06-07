@@ -33,10 +33,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
-import dalvik.annotation.TestTargetClass;
-import devlight.io.sample.GPSTracker;
-import devlight.io.sample.R;
-
 /**
  * This demo shows how GMS Location can be used to check for changes to the users location.  The
  * "My Location" button uses GMS Location to set the blue dot representing the users location.

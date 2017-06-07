@@ -115,7 +115,7 @@ public class Message extends Activity implements Button.OnClickListener {
                     uploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
-                            Toast.makeText(Message.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Message.this, exception.getMessage(), Toast.LENGTH_SHORT).show();Toast.makeText(Message.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
                             Log.d("Fail", exception.getMessage());
                         }
                     }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -199,8 +199,11 @@ public class Message extends Activity implements Button.OnClickListener {
                 ActivityCompat.requestPermissions(
                         this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                getLocalImg();
             }
-            getLocalImg();
+            else{
+                getLocalImg();
+            }
         } else if (v.getId() == map_button.getId()) {
             i = new Intent(Message.this,googlemap.class);
             i.putExtra("group",group_name);

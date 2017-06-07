@@ -52,6 +52,7 @@ public class Register extends Activity implements Button.OnClickListener {
         final EditText re_password = (EditText) findViewById(R.id.Register_Password);
         EditText re_check = (EditText) findViewById(R.id.Register_Check);
         if (!re_password.getText().toString().equals(re_check.getText().toString())) {
+            Toast.makeText(Register.this, "兩次密碼不相同", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(re_account.getText().toString(), re_password.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -61,6 +62,7 @@ public class Register extends Activity implements Button.OnClickListener {
                                 Toast.makeText(Register.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
                                 Log.d("帳號註冊失敗", task.getException().toString());
                             } else {
+                                Toast.makeText(Register.this, "註冊中請稍後", Toast.LENGTH_SHORT).show();
                                 myRef.child(mAuth.getCurrentUser().getUid()).child("name").setValue(re_nickname.getText().toString());
                                 Log.d("nickname", re_nickname.getText().toString());
                                 startActivity(

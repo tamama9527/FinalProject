@@ -29,7 +29,7 @@ public class Service extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.mipmap.ic_launcher2)
                         .setContentTitle("Help!!")
                         .setContentText(remoteMessage.getNotification().getBody());
 // Creates an explicit intent for an Activity in your app
@@ -56,9 +56,6 @@ public class Service extends FirebaseMessagingService {
         mNotificationManager.notify(1, mBuilder.build());
         Vibrator myVibrator = (Vibrator) getApplication().getSystemService(Service.VIBRATOR_SERVICE);
         myVibrator.vibrate(new long[]{100, 1000, 100, 1000, 100, 1000}, -1);
-        Looper.prepare();
-        Toast.makeText(this,remoteMessage.getNotification().getBody(), Toast.LENGTH_SHORT).show();
-        Looper.loop();
         Log.d("FCM", "onMessageReceived:" + remoteMessage.getNotification().getBody());
     }
 }

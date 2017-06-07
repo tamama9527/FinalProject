@@ -110,6 +110,8 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                                 myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     int group_count;
                                     int friend_count;
+                                    int flag = 0;
+
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         if (friend.isChecked()) {
@@ -123,25 +125,32 @@ public class HorizontalNtbActivity extends Activity implements Button.OnClickLis
                                             }
                                             recyclerView.setAdapter(new RecycleAdapter());
                                         } else if (group.isChecked()) {
-                                            if(dataSnapshot.child("group").child(add_text.getText().toString()).exists()) {
-                                                group_count = (int) dataSnapshot.child("group").child(add_text.getText().toString()).child("member").getChildrenCount();
-                                                myRef.child("group").child(add_text.getText().toString()).child("member").child(String.valueOf(group_count)).setValue(user.getUid());
-                                                myRef.child("member").child(user.getUid()).child("group").child(String.valueOf(dataSnapshot.child("member").child(user.getUid()).child("group").getChildrenCount())).setValue(add_text.getText().toString());
-                                                Toast.makeText(HorizontalNtbActivity.this, "已成功加入群組", Toast.LENGTH_SHORT).show();
-                                                recyclerView.setAdapter(new RecycleAdapter());
-                                            }
-                                            else{
+                                            if (dataSnapshot.child("group").child(add_text.getText().toString()).exists()) {
+                                                for (DataSnapshot group_test : dataSnapshot.child("group").child(add_text.getText().toString()).child("member").getChildren()) {
+                                                    if (user.getUid().equals(group_test.getValue().toString())) {
+                                                        Toast.makeText(HorizontalNtbActivity.this, "已擁有此群組", Toast.LENGTH_SHORT).show();
+                                                        flag = 1;
+                                                    }
+                                                }
+                                                if (flag == 0) {
+                                                    Log.d("test_funciton", String.valueOf(dataSnapshot.child("member").child(user.getUid()).child("group").hasChild(add_text.getText().toString())));
+                                                    group_count = (int) dataSnapshot.child("group").child(add_text.getText().toString()).child("member").getChildrenCount();
+                                                    myRef.child("group").child(add_text.getText().toString()).child("member").child(String.valueOf(group_count)).setValue(user.getUid());
+                                                    myRef.child("member").child(user.getUid()).child("group").child(String.valueOf(dataSnapshot.child("member").child(user.getUid()).child("group").getChildrenCount())).setValue(add_text.getText().toString());
+                                                    Toast.makeText(HorizontalNtbActivity.this, "已成功加入群組", Toast.LENGTH_SHORT).show();
+                                                    recyclerView.setAdapter(new RecycleAdapter());
+                                                }
+                                            } else {
                                                 Toast.makeText(HorizontalNtbActivity.this, "群組不存在", Toast.LENGTH_SHORT).show();
                                             }
                                         } else if (new_group.isChecked()) {
-                                            if(!dataSnapshot.child("group").child(add_text.getText().toString()).exists()) {
+                                            if (!dataSnapshot.child("group").child(add_text.getText().toString()).exists()) {
                                                 group_count = (int) dataSnapshot.child("group").child(add_text.getText().toString()).child("member").getChildrenCount();
                                                 myRef.child("group").child(add_text.getText().toString()).child("member").child(String.valueOf(group_count)).setValue(user.getUid());
                                                 myRef.child("member").child(user.getUid()).child("group").child(String.valueOf(dataSnapshot.child("member").child(user.getUid()).child("group").getChildrenCount())).setValue(add_text.getText().toString());
                                                 Toast.makeText(HorizontalNtbActivity.this, "已成功新增群組", Toast.LENGTH_SHORT).show();
                                                 recyclerView.setAdapter(new RecycleAdapter());
-                                            }
-                                            else{
+                                            } else {
                                                 Toast.makeText(HorizontalNtbActivity.this, "已有相同名稱的群組", Toast.LENGTH_SHORT).show();
                                             }
                                         }
